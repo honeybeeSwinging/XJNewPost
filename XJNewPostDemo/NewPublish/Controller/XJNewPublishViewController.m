@@ -131,6 +131,7 @@
     contentTextView.placeholderText =  @"分享新鲜事...";
     [self.backScrollView addSubview:contentTextView];
     
+    
     [self.backScrollView addSubview:self.picsCollectonView];
 
     [self.view addSubview:self.publishToolView];
