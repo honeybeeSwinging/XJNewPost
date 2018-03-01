@@ -248,6 +248,9 @@
         _picsCollectonView = picsCollection;
         
         [picsCollection registerClass:[XJCollectionViewCell class] forCellWithReuseIdentifier:@"cell"];
+        UILongPressGestureRecognizer *longPresssGes = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressPics:)];
+        [picsCollection addGestureRecognizer:longPresssGes];
+        
     }
     return _picsCollectonView;
     
@@ -363,9 +366,15 @@
             WeakSelf(weakSelf);
             VC.chooseUserBlock = ^(XJUser *user) {
                 
-                NSMutableString *nameStr = [[NSMutableString alloc]initWithString:contentTextView.text?contentTextView.text:@""];
-                [nameStr appendFormat:@"@%@",user.name];
-                contentTextView.text = nameStr;
+                
+                NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc]initWithAttributedString:contentTextView.attributedText];
+                
+                NSMutableAttributedString *atAttribute = [[NSMutableAttributedString alloc]initWithString:[NSString stringWithFormat:@"@%@ ",user.name]];
+                atAttribute.font = GETFONT(16);
+                [attributeString appendAttributedString:atAttribute];
+                
+                contentTextView.attributedText = attributeString;
+                
                 [weakSelf calculateRemainNum];
                 [self.atArray addObject:user];
                 
@@ -460,7 +469,7 @@
     
     NSMutableAttributedString *imageStr = [NSMutableAttributedString attachmentStringWithContent:image  contentMode:UIViewContentModeCenter attachmentSize:image.size alignToFont:GETFONT(16) alignment:YYTextVerticalAlignmentCenter];
     imageStr.font = GETFONT(16);
-    
+   
     [attributeString appendAttributedString:imageStr];
     
     contentTextView.attributedText = attributeString;
@@ -540,6 +549,25 @@
     browserVc.currentImageIndex = (int)indexPath.item;
     browserVc.delegate = self;
     [browserVc show];
+    
+}
+
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
+{
+    
+    //如果移到添加按钮后面，就退出，不能移动
+    NSInteger destinationRow = destinationIndexPath.row;
+    NSInteger picsCout = self.picsArray.count;
+    if (destinationRow == picsCout)
+    {
+        return;
+    }
+    
+    UIImage *picImage = self.picsArray[sourceIndexPath.item];
+    
+    [_picsArray removeObjectAtIndex:sourceIndexPath.row];
+    
+    [_picsArray insertObject:picImage atIndex:destinationIndexPath.row];
     
 }
 
@@ -717,6 +745,44 @@
     NSString *content = [commitString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     
     return content;
+}
+
+- (void) longPressPics:(UILongPressGestureRecognizer *)longPressGes
+{
+    
+    // 禁止拖动加号:
+    NSIndexPath *indexPath = [self.picsCollectonView indexPathForItemAtPoint:[longPressGes locationInView:self.picsCollectonView]];
+    if (indexPath.row == self.picsArray.count +1 && self.picsArray.count < 9) {
+        return;
+    }
+    
+    switch (longPressGes.state) {
+            
+        case UIGestureRecognizerStateBegan: {
+            
+            // 如果点击的位置不是cell,break
+            if (nil == indexPath) {
+                break;
+            }
+            [self.picsCollectonView beginInteractiveMovementForItemAtIndexPath:indexPath];
+        }
+            break;
+            
+        case UIGestureRecognizerStateChanged:
+            
+            [self.picsCollectonView updateInteractiveMovementTargetPosition:[longPressGes locationInView:self.picsCollectonView]];
+            break;
+            
+        case UIGestureRecognizerStateEnded:
+
+            [self.picsCollectonView endInteractiveMovement];
+            break;
+            
+        default:
+            [self.picsCollectonView cancelInteractiveMovement];
+            break;
+    }
+    
 }
 
 #pragma mark - photobrowser代理方法 -
