@@ -25,7 +25,32 @@
 ## 二、底部功能框会随着键盘和表情面板高度上移下移
 
 监听键盘的出现和消失,
-![屏幕快照 2018-03-01 23.15.56.png](http://upload-images.jianshu.io/upload_images/2099412-767b3f930133f944.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+```
+- (void) adjustPublishToolsViewFrame:(CGRect)rect publishSelType:(publishSelType)type;
+{
+
+    //动画改变frame:
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:animationDuration?animationDuration:0.25f];
+    [UIView setAnimationCurve:[curve intValue]];
+    
+    self.publishToolView.est_top =  rect.origin.y - 89;
+    
+    if (type == publishSelTypeFace) {
+        
+        _faceView.est_top = XJSCREENHEIGHT - FaceVieHeight;
+        
+    }else{
+        
+        _faceView.est_top = XJSCREENHEIGHT;
+    }
+    
+    [UIView commitAnimations];
+    
+}
+```
 
 ## 三、表情处理
 
