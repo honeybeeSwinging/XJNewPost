@@ -6,6 +6,15 @@
 //  Copyright © 2018年 XJ. All rights reserved.
 //
 
+//表情显示方案二:YYText添加解析器,也可实现;
+/*
+ YYTextSimpleEmoticonParser *parser = [YYTextSimpleEmoticonParser new];
+ NSMutableDictionary *mapper = [NSMutableDictionary new];
+ mapper[@"微笑"] = [UIImage imageNamed:@"Expression_1"];
+ parser.emoticonMapper = mapper;
+ contentTextView.textParser = parser;
+ */
+
 #import "XJNewPublishViewController.h"
 #import "XJPublishToolsView.h"
 #import "XJFaceView.h"
@@ -560,6 +569,7 @@
     NSInteger picsCout = self.picsArray.count;
     if (destinationRow == picsCout)
     {
+
         return;
     }
     

@@ -91,46 +91,51 @@
     NSMutableArray*markArray = [NSMutableArray arrayWithCapacity:0];
     for (int i = 0 ; i < kindArray.count; i++) {
         
-        YYLabel *facelab = [[YYLabel alloc]initWithFrame:CGRectMake(XJSCREENWIDTH*i+5, -10, XJSCREENWIDTH, self.frame.size.height -10)];
-        facelab.tag = i;
-        facelab.backgroundColor = [UIColor whiteColor];
-        facelab.numberOfLines = 0;
-        [_pageScrollVeiw addSubview:facelab];
-        
-        NSMutableDictionary * attactTextDic = [NSMutableDictionary dictionaryWithCapacity:0];
-        NSMutableAttributedString *text = [NSMutableAttributedString new];
-        UIFont *font = [UIFont systemFontOfSize:16];
-        
-        NSArray *keyArray = kindArray[i];
-        
-        for (NSString *key in keyArray) {
+        @autoreleasepool
+        {
+            YYLabel *facelab = [[YYLabel alloc]initWithFrame:CGRectMake(XJSCREENWIDTH*i+5, -10, XJSCREENWIDTH, self.frame.size.height -10)];
+            facelab.tag = i;
+            facelab.backgroundColor = [UIColor whiteColor];
+            facelab.numberOfLines = 0;
+            [_pageScrollVeiw addSubview:facelab];
             
-            NSString *imageNamed = [[emtionDic[key]componentsSeparatedByString:@"@"]firstObject];
-            UIImage *image = [UIImage imageNamed:imageNamed];
-            XJAnimatedImageView *imageView = [[XJAnimatedImageView alloc] initWithImage:image];
-            NSMutableAttributedString *attachText = [NSMutableAttributedString attachmentStringWithContent:imageView contentMode:UIViewContentModeCenter attachmentSize:CGSizeMake(imageView.size.width+20, imageView.size.height+20) alignToFont:font alignment:YYTextVerticalAlignmentCenter];
-            [text appendAttributedString:attachText];
+            NSMutableDictionary * attactTextDic = [NSMutableDictionary dictionaryWithCapacity:0];
+            NSMutableAttributedString *text = [NSMutableAttributedString new];
+            UIFont *font = [UIFont systemFontOfSize:16];
             
-            [attactTextDic setObject:key forKey:[NSValue valueWithRange:NSMakeRange(text.length-1, 1)]];
+            NSArray *keyArray = kindArray[i];
             
-            [text setTextHighlightRange:NSMakeRange(text.length-1, 1) color:[UIColor whiteColor] backgroundColor:[UIColor whiteColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
+            for (NSString *key in keyArray) {
                 
-                YYLabel*label = (YYLabel*)containerView;
-                NSDictionary*markDic = markArray[label.tag];
+                NSString *imageNamed = [[emtionDic[key]componentsSeparatedByString:@"@"]firstObject];
+                UIImage *image = [UIImage imageNamed:imageNamed];
+                XJAnimatedImageView *imageView = [[XJAnimatedImageView alloc] initWithImage:image];
+                NSMutableAttributedString *attachText = [NSMutableAttributedString attachmentStringWithContent:imageView contentMode:UIViewContentModeCenter attachmentSize:CGSizeMake(imageView.size.width+20, imageView.size.height+20) alignToFont:font alignment:YYTextVerticalAlignmentCenter];
+                [text appendAttributedString:attachText];
                 
-                if (self.delegate && [self.delegate respondsToSelector:@selector(faceViewClickEmotionString:EmojeNamed:)]) {
+                [attactTextDic setObject:key forKey:[NSValue valueWithRange:NSMakeRange(text.length-1, 1)]];
+                
+                [text setTextHighlightRange:NSMakeRange(text.length-1, 1) color:[UIColor whiteColor] backgroundColor:[UIColor whiteColor] tapAction:^(UIView * _Nonnull containerView, NSAttributedString * _Nonnull text, NSRange range, CGRect rect) {
                     
-                    NSString *emojeKey = markDic[[NSValue valueWithRange:range]];
-                    NSString *imageNamed = [[emtionDic[emojeKey]componentsSeparatedByString:@"@"]firstObject];
-                    [self.delegate faceViewClickEmotionString:emojeKey EmojeNamed:imageNamed];
-                }
+                    YYLabel*label = (YYLabel*)containerView;
+                    NSDictionary*markDic = markArray[label.tag];
+                    
+                    if (self.delegate && [self.delegate respondsToSelector:@selector(faceViewClickEmotionString:EmojeNamed:)]) {
+                        
+                        NSString *emojeKey = markDic[[NSValue valueWithRange:range]];
+                        NSString *imageNamed = [[emtionDic[emojeKey]componentsSeparatedByString:@"@"]firstObject];
+                        [self.delegate faceViewClickEmotionString:emojeKey EmojeNamed:imageNamed];
+                    }
+                    
+                }];
                 
-            }];
+            }
             
+            [markArray addObject:attactTextDic];
+            facelab.attributedText = text;
         }
         
-        [markArray addObject:attactTextDic];
-        facelab.attributedText = text;
+       
         
     }
     
